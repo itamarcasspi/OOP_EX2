@@ -1,54 +1,95 @@
 
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Consumer;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import api.DirectedWeightedGraph;
 import api.EdgeData;
 import api.NodeData;
 
+import api.lib;
+
+import static api.lib.parseJSONFile;
+
+
 public class Directed_Weighted_Graph implements DirectedWeightedGraph {
+    
     HashMap<Integer, NodeData> nodesMap;
-    HashMap<Integer, HashMap<Integer, EdgeData>> edgeMap;
+    HashMap<Integer, EdgeData> edgeMap;
     HashMap<Integer, HashMap<Integer, EdgeData>> destToSource;
     int edges_size;
     int mc;
 
     public Directed_Weighted_Graph() {
         nodesMap = new HashMap<Integer, NodeData>();
-        edgeMap = new HashMap<Integer, HashMap<Integer, EdgeData>>();
+        edgeMap = new HashMap<Integer, EdgeData>();
         destToSource = new HashMap<Integer, HashMap<Integer, EdgeData>>();
         mc = 0;
         edges_size=0;
     }
 
     public Directed_Weighted_Graph(Directed_Weighted_Graph g) {
-        this.nodesMap = new HashMap<Integer, NodeData>();
-        for (Map.Entry<Integer, NodeData> entry : g.nodesMap.entrySet()) {
-            this.nodesMap.put(entry.getKey(), entry.getValue());
+        nodesMap = new HashMap<>();
+        edgeMap = new HashMap<>();
+
+        /** Go through all the nodes in g and create a new node that copies the node in g **/
+        Iterator<NodeData> NodeI = g.nodeIter();
+        while(NodeI.hasNext()) {
+            NodeData currNode = NodeI.next();
+            nodesMap.put(currNode.getKey(), new Node_Data(currNode));
         }
 
-        this.destToSource = new HashMap<>();
-        for (Map.Entry<Integer, HashMap<Integer, EdgeData>> a : g.destToSource.entrySet()) {
-            HashMap<Integer,EdgeData> temp = new HashMap<>();
-            this.destToSource.put(a.getKey(),temp);
-            for (Map.Entry<Integer, EdgeData> b : a.getValue().entrySet()) {
-                this.destToSource.get(a.getKey()).put(b.getKey(), b.getValue());
-            }
+        Iterator<EdgeData> EdgeI = g.edgeIter();
+        while(EdgeI.hasNext()) {
+            EdgeData currEdge = EdgeI.next();
+            Edge_Data newEdge = new Edge_Data(currEdge);
+
+            /**Three hashmaps that hold edges**/
+            nodesMap.get(newEdge.getSrc()).getOutEdges().put(newEdge.getDest(), newEdge);
+            nodesMap.get(newEdge.getDest()).getInEdges().put(newEdge.getSrc(), newEdge);
+            edgeMap.put(newEdge.getId(), newEdge);
+
+        }
+    }
+
+    public Directed_Weighted_Graph(String jsonFileName) {
+        nodesMap = new HashMap<>();
+        edgeMap = new HashMap<>();
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = parseJSONFile(jsonFileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JSONArray jsonNodes = jsonObject.getJSONArray("Nodes");
+        for(int i=0;i<jsonNodes.length();i++){
+            int key=jsonNodes.getJSONObject(i).getInt("id");
+            String pos=jsonNodes.getJSONObject(i).getString("pos");
+            Node_Data v = new Node_Data(key, pos);
+            nodesMap.put(v.getKey(), v);
         }
 
-        this.edgeMap = new HashMap<>();
-        for (Map.Entry<Integer, HashMap<Integer, EdgeData>> a : g.edgeMap.entrySet()) {
-            HashMap<Integer,EdgeData> temp = new HashMap<>();
-            this.edgeMap.put(a.getKey(),temp);
-            for (Map.Entry<Integer, EdgeData> b : a.getValue().entrySet()) {
-                this.edgeMap.get(a.getKey()).put(b.getKey(), b.getValue());
-            }
-        }
-        this.mc = g.mc;
-        edges_size = g.edges_size;
+        JSONArray jsonEdges = jsonObject.getJSONArray("Edges");
+        for (int i = 0; i < jsonEdges.length(); i++) {
+            int src = jsonEdges.getJSONObject(i).getInt("src");
+            int dest = jsonEdges.getJSONObject(i).getInt("dest");
+            double w = jsonEdges.getJSONObject(i).getDouble("w");
 
+            Edge_Data e = new Edge_Data(src, dest, w, edges_size);
+            edges_size++;
+
+            /**Three hashmaps that hold edges**/
+            nodesMap.get(e.getSrc()).getOutEdges().put(e.getDest(), e);
+            nodesMap.get(e.getDest()).getInEdges().put(e.getSrc(), e);
+            edgeMap.put(e.id, e);
+        }
     }
 
     @Override
@@ -57,9 +98,12 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
     }
 
     @Override
-    public EdgeData getEdge(int src, int dest) {
-
-        return edgeMap.get(src).get(dest);
+    public EdgeData getEdge(int src, int dest)
+    {
+        if(nodesMap.get(dest).getInEdges().containsKey(src)){
+            return nodesMap.get(dest).getInEdges().get(src);
+        }
+        return null;
     }
 
     @Override
@@ -75,38 +119,17 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
     @Override
     public void connect(int src, int dest, double w) {
-        if (edgeMap.containsKey(src)) {
-            if (edgeMap.get(src).containsKey(dest))
-            {
-                return;
-            }
-            if (!edgeMap.get(src).containsKey(dest)) {
-                EdgeData edge = new Edge_Data(src, dest, w);
-                edgeMap.get(src).put(dest, edge);
-                mc++;
-                edges_size++;
-            }
-        } else {
-            mc++;
+        if(nodesMap.containsKey(src)&&nodesMap.containsKey(dest)){
+            Edge_Data edgeData=new Edge_Data(src,dest,w, edges_size);
             edges_size++;
-            EdgeData edge = new Edge_Data(src, dest, w);
-            HashMap<Integer, EdgeData> dstMap = new HashMap<Integer, EdgeData>();
-            edgeMap.put(src, dstMap);
-            edgeMap.get(src).put(dest, edge);
-        }
-        //now we add to the hashmap that contains edges from dest to src
-        if (destToSource.containsKey(dest)) {
-            if (!destToSource.get(dest).containsKey(src)) {
-                EdgeData edge = new Edge_Data(src, dest, w);
-                destToSource.get(dest).put(src, edge);
-            }
-        } else {
-            EdgeData edge = new Edge_Data(src, dest, w);
-            HashMap<Integer, EdgeData> dstMap = new HashMap<Integer, EdgeData>();
-            destToSource.put(dest, dstMap);
-            destToSource.get(dest).put(src, edge);
-        }
+            mc++;
+            nodesMap.get(src).getOutEdges().put(dest,edgeData);
+            nodesMap.get(dest).getInEdges().put(src,edgeData);
+            edgeMap.put(edgeData.getId(),edgeData);
+        } //MAYBE ADD SOMETHING THAT CHECKS IF THE EDGE ALREADY EXISTS WITH THE SAME WEIGHT
+          //OR MAYBE ITS OKAY TO HAVE DUPLICATES AND WE NEED TO ADD THE EDGE ANYWAY
     }
+
 //Creating the node iterator
     @Override
     public Iterator<NodeData> nodeIter() {
@@ -139,145 +162,241 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
             return it.next();
         }
     }
-    //creating the entire edge iterator
+    // //creating the entire edge iterator
+    // @Override
+    // public Iterator<EdgeData> edgeIter() {
+    //     return new AllEdgeIterator(getMC());
+    // }
+    // class AllEdgeIterator implements Iterator
+    // {
+    //     int mc_at_init;
+    //     Iterator<HashMap<Integer,EdgeData>> it_src;
+    //     Iterator<EdgeData> edge_it;
+
+    //     public AllEdgeIterator(int mc)
+    //     {
+    //         mc_at_init = mc;
+    //         it_src = edgeMap.values().iterator();
+    //         edge_it = it_src.next().values().iterator();
+    //     }
+
+    //     @Override
+    //     public boolean hasNext() {
+    //         if(mc_at_init!=getMC())
+    //         {
+    //             throw new RuntimeException();
+    //         }
+    //         if(!edge_it.hasNext())
+    //         {
+    //             if(!it_src.hasNext())
+    //             {
+    //                 return false;
+    //             }
+    //         }
+    //         return true;
+    //     }
+
+    //     @Override
+    //     public Object next() {
+    //         if(mc_at_init!=getMC())
+    //         {
+    //             throw new RuntimeException();
+    //         }
+    //         if(!edge_it.hasNext())
+    //         {
+    //             if(it_src.hasNext()) {
+    //                 edge_it = it_src.next().values().iterator();
+    //                 return edge_it.next();
+    //             }
+    //         }
+    //         return edge_it.next();
+    //     }
+    // }
+
+    // @Override
+    // public Iterator<EdgeData> edgeIter(int node_id) {
+    //     return new EdgeIterator(getMC(),node_id);
+    // }
+    // class EdgeIterator implements Iterator {
+    //     int mc_at_init;
+    //     Iterator<EdgeData> edge_it;
+
+    //     public EdgeIterator(int mc, int src) {
+
+    //         mc_at_init = mc;
+    //         if(edgeMap.get(src)==null || edgeMap.get(src).size()==0)
+    //         {
+    //             edge_it = null;
+    //         }
+    //         else
+    //         {
+    //             edge_it = edgeMap.get(src).values().iterator();
+    //         }
+    //     }
+
+    //     @Override
+    //     public boolean hasNext() {
+    //         if (mc_at_init != getMC()) {
+    //             throw new RuntimeException();
+    //         }
+    //         if(edge_it == null)
+    //         {
+    //             return false;
+    //         }
+    //         return edge_it.hasNext();
+    //     }
+
+    //     @Override
+    //     public Object next() {
+    //         if (mc_at_init != getMC()) {
+    //             throw new RuntimeException();
+    //         }
+    //         return edge_it.next();
+    //     }
+    // }
+
     @Override
     public Iterator<EdgeData> edgeIter() {
-        return new AllEdgeIterator(getMC());
-    }
-    class AllEdgeIterator implements Iterator
-    {
-        int mc_at_init;
-        Iterator<HashMap<Integer,EdgeData>> it_src;
-        Iterator<EdgeData> edge_it;
-
-        public AllEdgeIterator(int mc)
-        {
-            mc_at_init = mc;
-            it_src = edgeMap.values().iterator();
-            edge_it = it_src.next().values().iterator();
-        }
-
-        @Override
-        public boolean hasNext() {
-            if(mc_at_init!=getMC())
-            {
-                throw new RuntimeException();
-            }
-            if(!edge_it.hasNext())
-            {
-                if(!it_src.hasNext())
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public Object next() {
-            if(mc_at_init!=getMC())
-            {
-                throw new RuntimeException();
-            }
-            if(!edge_it.hasNext())
-            {
-                if(it_src.hasNext()) {
-                    edge_it = it_src.next().values().iterator();
-                    return edge_it.next();
-                }
-            }
-            return edge_it.next();
-        }
+        return new EdgeIter();
     }
 
+    /**
+     * Returns the iterator for the out edge's hashmap,
+     * this hashmap is stored inside the Node's object.
+     * @param node_id - the ID of the node that you want to access it's out edges hashmap.
+     * @return Iterator - the iterator itself.
+     */
     @Override
     public Iterator<EdgeData> edgeIter(int node_id) {
-        return new EdgeIterator(getMC(),node_id);
+        return new outEdgesIter(node_id); //probably not the solution but maybe it is
     }
-    class EdgeIterator implements Iterator {
-        int mc_at_init;
-        Iterator<EdgeData> edge_it;
 
-        public EdgeIterator(int mc, int src) {
-
-            mc_at_init = mc;
-            if(edgeMap.get(src)==null || edgeMap.get(src).size()==0)
-            {
-                edge_it = null;
-            }
-            else
-            {
-                edge_it = edgeMap.get(src).values().iterator();
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (mc_at_init != getMC()) {
-                throw new RuntimeException();
-            }
-            if(edge_it == null)
-            {
-                return false;
-            }
-            return edge_it.hasNext();
-        }
-
-        @Override
-        public Object next() {
-            if (mc_at_init != getMC()) {
-                throw new RuntimeException();
-            }
-            return edge_it.next();
-        }
-    }
     //remove node complexity is as the number of its neighbors- we delete the edges that the node is the src and dst
     @Override
     public NodeData removeNode(int key) {
-        if (!nodesMap.containsKey(key)) {
-            return null;
-        }
-        mc++;
 
-        NodeData removed = nodesMap.remove(key);
-        //remove the edges that our node is the destination of.
-        for (Map.Entry<Integer, EdgeData> src : destToSource.get(key).entrySet()) {
-            edgeMap.get(src.getKey()).remove(key);
-            edges_size--;
-            if(edgeMap.get(src.getKey()).size()==0)
-            {
-                edgeMap.remove(src.getKey());
+        if (nodesMap.containsKey(key)) {
+            Object[] inedges = nodesMap.get(key).getInEdges().keySet().toArray();      //keyset is O(1)
+            Object[] outedges = nodesMap.get(key).getOutEdges().keySet().toArray();    //keyset is O(1)
+            int[] inIds = new int[inedges.length];
+            int[] outIds = new int[outedges.length];
+
+            /**SIZE OF inIds+outIds is equal to v.degree**/
+            /** O(3*v.degree)=O(v.degree)**/
+            for (int i = 0; i < inIds.length; i++) {
+                inIds[i] = getEdge((int) inedges[i], key).getId();
             }
+            for (int i = 0; i < outIds.length; i++) {
+                outIds[i] = getEdge(key, (int) outedges[i]).getId();
+            }
+
+            for (int i = 0; i < inIds.length; i++) {
+                removeEdge(inIds[i], i);
+            }
+            for (int i = 0; i < outIds.length; i++) {
+                removeEdge(outIds[i], i);
+            }
+
+            nodesMap.get(key).getOutEdges().clear();       //Clear is O(n) where n is the number of out edges
+            nodesMap.get(key).getInEdges().clear();        //Clear is O(n) where n is the number of in edges
+
+            mc++;
+            return nodesMap.remove(key);
+        } else return null;
+    }
+
+
+    private class outEdgesIter implements Iterator<EdgeData> {
+
+        private Iterator<EdgeData> Iter;
+        private EdgeData currEdge;
+        int key;
+        public outEdgesIter(int NodeKey) {
+            Iter = nodesMap.get(NodeKey).getOutEdges().values().iterator();
+            key = NodeKey;
         }
 
-        //remove the edges that our node is the source of.
-        edges_size -= edgeMap.get(key).size();
-        edgeMap.remove(key);
+        @Override
+        public boolean hasNext() {
+            return Iter.hasNext();
+        }
 
-        return removed;
+        @Override
+        public EdgeData next() {
+            currEdge = Iter.next();
+            return currEdge;
+        }
 
+        @Override
+        public void remove() {
+            if (!Iter.hasNext()) return;
+            EdgeData tempEdge = Iter.next();
+            EdgeData nextEdge;
+            removeEdge(currEdge.getId(),0);
+            Iter = nodesMap.get(key).getOutEdges().values().iterator();
+            nextEdge = tempEdge;
+            while (nextEdge!=tempEdge) {
+                nextEdge=Iter.next();
+            }
+            currEdge = tempEdge;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super EdgeData> action) {
+            Iterator.super.forEachRemaining(action);
+        }
     }
+    
 
     @Override
     public EdgeData removeEdge(int src, int dest) {
-        if (edgeMap.containsKey(src)) {
-            if (edgeMap.get(src).containsKey(dest)) {
-                mc++;
-                edges_size--;
-                EdgeData removed = edgeMap.get(src).remove(dest);
-                if(edgeMap.get(src).size()==0)
-                {
-                    edgeMap.remove(src);
-                }
-                if(destToSource.containsKey(dest))
-                {
-                    destToSource.get(dest).remove(src);
-                }
-            }
+        if (nodesMap.containsKey(src)&&nodesMap.containsKey(dest)&&nodesMap.get(src).getOutEdges().containsKey(dest)) {
 
+        int id = nodesMap.get(dest).getInEdges().get(src).getId();
+        // could also be nodes.get(src).getOutEdges().get(dest).getId();
+        edgeMap.remove(id);
+        nodesMap.get(dest).getInEdges().remove(src);
+        mc++;
+        return nodesMap.get(src).getOutEdges().remove(dest);
+        } else return null;
+    }
+
+    private class EdgeIter implements Iterator<EdgeData> {
+
+        private EdgeData currEdge;
+        private Iterator<EdgeData> Iter;
+        public EdgeIter() {
+            Iter = edgeMap.values().iterator();
         }
 
-        return null;
+        @Override
+        public boolean hasNext() {
+            return Iter.hasNext();
+        }
+
+        @Override
+        public EdgeData next() {
+            currEdge = Iter.next();
+            return currEdge;
+        }
+
+        @Override
+        public void remove() {
+            EdgeData tempEdge = Iter.next();
+            EdgeData nextEdge;
+            removeEdge(currEdge.getId(),0);
+            Iter = edgeMap.values().iterator();
+            nextEdge = tempEdge;
+            while (nextEdge!=tempEdge) {
+                nextEdge=Iter.next();
+            }
+            currEdge = tempEdge;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super EdgeData> action) {
+            Iterator.super.forEachRemaining(action);
+        }
     }
 
     @Override
@@ -299,7 +418,7 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
     {
         return nodesMap;
     }
-    public HashMap<Integer, HashMap<Integer, EdgeData>> getEdgeMap()
+    public HashMap<Integer, EdgeData> getEdgeMap()
     {
         return edgeMap;
     }

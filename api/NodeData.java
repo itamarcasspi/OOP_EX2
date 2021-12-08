@@ -1,11 +1,19 @@
 package api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This interface represents the set of operations applicable on a 
  * node (vertex) in a (directional) weighted graph.
  * @author boaz.benmoshe
  */
 public interface NodeData {
+
+	public HashMap<Integer, EdgeData> getOutEdges(); //Integer is the destination of each edge in the map
+
+	public HashMap<Integer, EdgeData> getInEdges(); // Integer is the source of each edge in the map
+
 	/**
 	 * Returns the key (id) associated with this node.
 	 * @return
