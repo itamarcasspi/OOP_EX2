@@ -308,6 +308,7 @@ public class GUI extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     String NameOfGraph = JOptionPane.showInputDialog(
                             "Insert name of existing graph\nThe graph should be inside the data folder");
+                    System.out.println(NameOfGraph);
                     if (NameOfGraph != null && GUIgraph.load("data/" + NameOfGraph + ".json")) {
                         msg = "Loaded!";
                         maxX = Integer.MIN_VALUE;

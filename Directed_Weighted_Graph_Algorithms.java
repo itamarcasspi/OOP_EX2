@@ -1,4 +1,6 @@
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Node;
 
 import api.DirectedWeightedGraph;
@@ -6,6 +8,8 @@ import api.DirectedWeightedGraphAlgorithms;
 import api.EdgeData;
 import api.NodeData;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraphAlgorithms {
@@ -149,8 +153,44 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public boolean save(String file) {
-        return false;
+        JSONObject json = new JSONObject();
+        JSONArray e = new JSONArray();
+        JSONArray v = new JSONArray();
+
+
+        Iterator<NodeData> NI = rawGraph.nodeIter();
+        while (NI.hasNext()) {
+            NodeData currNode = NI.next();
+            JSONObject jsonNode = new JSONObject();
+            jsonNode.put("pos", "" + currNode.getLocation().x() + "," + currNode.getLocation().y() + "," + currNode.getLocation().z());
+            jsonNode.put("id", currNode.getKey());
+            v.put(jsonNode);
+        }
+        Iterator<EdgeData> NJ = rawGraph.edgeIter();
+        while (NJ.hasNext()) {
+            EdgeData currEdge = NJ.next();
+            JSONObject jsonEdge = new JSONObject();
+            jsonEdge.put("src", currEdge.getSrc());
+            jsonEdge.put("w", currEdge.getWeight());
+            jsonEdge.put("dest", currEdge.getDest());
+            e.put(jsonEdge);
+        }
+        json.put("Edges", e);
+        json.put("Nodes", v);
+
+        try {
+            FileWriter Files = new FileWriter(file);
+            Files.write(json.toString());
+            Files.close();
+        }catch (IOException f) {
+            f.printStackTrace();
+            return false;
+        }
+        return true;
+
     }
+
+
 
     @Override
     public boolean load(String file) {

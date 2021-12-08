@@ -32,16 +32,14 @@ public class Ex2 {
 
 
     /**
-     * This static function will run your GUI using the json fime.
+     * This static function will run your GUI using the json file.
      *
      * @param json_file - a json file (e.g., G1.json - G3.gson)
      */
     public static void runGUI(String json_file) {
-        //DirectedWeightedGraph_ alg = new DirectedWeightedGraph_(json_file);
-        //DirectedWeightedGraph alg = getGrapg(json_file);
         DirectedWeightedGraphAlgorithms alg = getGrapgAlgo(json_file); //if we use the extends way it will work. (this is boaz's line)
 
-        JFrame screen = new JFrame("ze waze");
+        JFrame screen = new JFrame("OOP-EX2");
         screen.setSize(600,500);
 
         GUI graph = new GUI(alg);
@@ -64,10 +62,7 @@ public class Ex2 {
         screen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         screen.setLocationRelativeTo(null);
         screen.setVisible(true);
-
     }
-
-
 
     public static void main(String[] args) {
         DirectedWeightedGraphAlgorithms t = new Directed_Weighted_Graph_Algorithms("data/G1.json");
