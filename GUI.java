@@ -1,5 +1,3 @@
-package api;
-
 import javax.swing.*;
 import java.awt.*;
 

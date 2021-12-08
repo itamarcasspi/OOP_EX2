@@ -1,7 +1,9 @@
-package api;
+
 
 import java.util.List;
 import java.util.Queue;
+
+import api.NodeData;
 
 public class ComparableNode implements Comparable<ComparableNode>{
     NodeData node;

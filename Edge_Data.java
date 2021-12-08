@@ -1,6 +1,8 @@
-package api;
+
 
 import org.w3c.dom.Node;
+
+import api.EdgeData;
 
 public class Edge_Data implements EdgeData{
     int src,dest,tag;

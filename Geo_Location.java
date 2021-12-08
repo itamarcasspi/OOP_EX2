@@ -1,4 +1,6 @@
-package api;
+
+
+import api.GeoLocation;
 
 public class Geo_Location implements GeoLocation{
     double x,y,z;

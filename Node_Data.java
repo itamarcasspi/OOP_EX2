@@ -1,6 +1,9 @@
-package api;
+
 
 import javax.imageio.plugins.tiff.GeoTIFFTagSet;
+
+import api.GeoLocation;
+import api.NodeData;
 
 public class Node_Data implements NodeData{
     static int unique_id_generator = 0;
