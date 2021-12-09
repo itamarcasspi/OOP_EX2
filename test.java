@@ -7,10 +7,7 @@ import api.DirectedWeightedGraphAlgorithms;
 import api.EdgeData;
 import api.NodeData;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class test {
 
@@ -67,5 +64,11 @@ public class test {
         }
         System.out.println("shortest path is : "+algo.shortestPathDist(a0.getKey(),f5.getKey()));
 
+        List<NodeData> pathlist = algo.shortestPath(a0.getKey(),f5.getKey());
+        for (int i = 0; i<pathlist.size();i++)
+        {
+            System.out.print(pathlist.get(i).getKey()+">");
+        }
+        System.out.println();
     }
 }

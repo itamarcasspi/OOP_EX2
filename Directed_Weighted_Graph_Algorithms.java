@@ -6,7 +6,7 @@ import api.DirectedWeightedGraph;
 import api.DirectedWeightedGraphAlgorithms;
 import api.EdgeData;
 import api.NodeData;
-
+import java.util.Collections;
 import java.util.*;
 
 public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraphAlgorithms{
@@ -41,6 +41,7 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
     public double shortestPathDist(int src, int dest) {
         double[] dist = new double[graph.nodeSize()];
         double[] prev = new double[graph.nodeSize()];
+        HashMap<Integer,Integer> node_to_next = new HashMap<>();
         dist[src] = 0;
         PriorityQueue<ComparableNode> q = new PriorityQueue<>();
         Iterator<NodeData> node_it = graph.nodeIter();
@@ -71,16 +72,14 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
                             ComparableNode v = new ComparableNode(graph.getNode(edge.getDest()), alt);
                             dist[v.node.getKey()] = alt;
                             prev[v.node.getKey()] = u.node.getKey();
+
                             q.add(v);
                         }
                     }
                 }
             }
         }
-        for (int i = 0 ; i<prev.length;i++)
-        {
-            System.out.println("path - "+prev[i]);
-        }
+
         return dist[dest];
     }
 
@@ -126,6 +125,14 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
             }
         }
         List<NodeData> prevList = new LinkedList<>();
+        prevList.add(graph.getNode(dest));
+        int[] sorted_path = new int[prev.length];
+
+        for (int i = dest; i!=src; i = prev[i]) {
+            prevList.add(graph.getNode(prev[i]));
+        }
+
+        Collections.reverse(prevList);
 
         return prevList;
     }
@@ -147,6 +154,8 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public boolean load(String file) {
+        DirectedWeightedGraph new_graph = new Directed_Weighted_Graph();
+
         return false;
     }
 }

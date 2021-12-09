@@ -50,4 +50,21 @@ public class Edge_Data implements EdgeData{
     public void setTag(int t) {
         this.tag = t;
     }
+
+    public boolean isEqual(EdgeData e)
+    {
+        if(this.dest != e.getDest())
+        {
+            return false;
+        }
+        if(this.src != e.getSrc())
+        {
+            return false;
+        }
+        if(this.weight != e.getWeight())
+        {
+            return false;
+        }
+        return true;
+    }
 }

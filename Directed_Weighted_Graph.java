@@ -241,15 +241,15 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
         NodeData removed = nodesMap.remove(key);
         //remove the edges that our node is the destination of.
-        for (Map.Entry<Integer, EdgeData> src : destToSource.get(key).entrySet()) {
-            edgeMap.get(src.getKey()).remove(key);
-            edges_size--;
-            if(edgeMap.get(src.getKey()).size()==0)
-            {
-                edgeMap.remove(src.getKey());
+        if(destToSource.containsKey(key)) {
+            for (Map.Entry<Integer, EdgeData> src : destToSource.get(key).entrySet()) {
+                edgeMap.get(src.getKey()).remove(key);
+                edges_size--;
+                if (edgeMap.get(src.getKey()).size() == 0) {
+                    edgeMap.remove(src.getKey());
+                }
             }
         }
-
         //remove the edges that our node is the source of.
         edges_size -= edgeMap.get(key).size();
         edgeMap.remove(key);
