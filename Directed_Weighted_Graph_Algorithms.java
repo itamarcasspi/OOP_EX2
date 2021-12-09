@@ -13,6 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import static api.lib.parseJSONFile;
+
 public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraphAlgorithms {
     private DirectedWeightedGraph rawGraph;
     private DirectedWeightedGraph newGraph;
@@ -54,7 +56,36 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public boolean isConnected() {
-        return false;
+        boolean[] visited = new boolean[rawGraph.nodeSize()];
+        LinkedList<Integer> q = new LinkedList<>();
+
+        Iterator<NodeData> node = rawGraph.nodeIter();
+        int current = node.next().getKey();
+        visited[current] = true;
+        q.add(current);
+
+        while(!q.isEmpty())
+        {
+            current = q.poll();
+            Iterator<EdgeData> edge_it = rawGraph.edgeIter(current);
+            while (edge_it.hasNext())
+            {
+                EdgeData current_edge = edge_it.next();
+                if(!visited[current_edge.getDest()])
+                {
+                    visited[current_edge.getDest()] = true;
+                    q.add(current_edge.getDest());
+                }
+            }
+        }
+        for (boolean visit:visited)
+        {
+            if(!visit)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     // dijkstra
@@ -94,9 +125,6 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
                     }
                 }
             }
-        }
-        for (int i = 0; i < prev.length; i++) {
-            System.out.println("path - " + prev[i]);
         }
         return dist[dest];
     }
@@ -153,11 +181,62 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public NodeData center() {
-        return null;
+        int center_id = 0;
+        double min_longest_path = Integer.MAX_VALUE;
+        Iterator<NodeData> node_it = rawGraph.nodeIter();
+        double[][] dist = new double[rawGraph.nodeSize()][rawGraph.nodeSize()];
+        for (int i = 0; i<rawGraph.nodeSize();i++)
+        {
+            for (int j = 0; j<rawGraph.nodeSize();j++)
+            {
+                dist[i][j] = 2000000000;
+                if(i==j)
+                {
+                    dist[i][j] = 0;
+                }
+            }
+        }
+        Iterator<EdgeData> edge_it = rawGraph.edgeIter();
+        while (edge_it.hasNext())
+        {
+            EdgeData current = edge_it.next();
+            dist[current.getSrc()][current.getDest()] = current.getWeight();
+        }
+        for (int k = 0 ; k<rawGraph.nodeSize();k++)
+        {
+            for (int j = 0; j<rawGraph.nodeSize();j++)
+            {
+                for (int i = 0; i<rawGraph.nodeSize();i++)
+                {
+                    if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i<rawGraph.nodeSize();i++)
+        {
+            double current_max_path = 0;
+            for (int j = 0; j<rawGraph.nodeSize();j++)
+            {
+                if(dist[i][j]>current_max_path)
+                {
+                    current_max_path = dist[i][j];
+                }
+            }
+            if(current_max_path<min_longest_path)
+            {
+                min_longest_path = current_max_path;
+                center_id = i;
+            }
+        }
+        return rawGraph.getNode(center_id);
     }
 
     @Override
     public List<NodeData> tsp(List<NodeData> cities) {
+
         return null;
     }
 
@@ -206,6 +285,29 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
     public boolean load(String file) {
         DirectedWeightedGraph new_graph = new Directed_Weighted_Graph();
 
-        return false;
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = parseJSONFile(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        JSONArray jsonNodes = jsonObject.getJSONArray("Nodes");
+        for(int i=0;i<jsonNodes.length();i++){
+            int key=jsonNodes.getJSONObject(i).getInt("id");
+            String pos=jsonNodes.getJSONObject(i).getString("pos");
+            Node_Data v = new Node_Data(key, pos);
+            new_graph.addNode(v);
+        }
+
+        JSONArray jsonEdges = jsonObject.getJSONArray("Edges");
+        for (int i = 0; i < jsonEdges.length(); i++) {
+            int src = jsonEdges.getJSONObject(i).getInt("src");
+            int dest = jsonEdges.getJSONObject(i).getInt("dest");
+            double w = jsonEdges.getJSONObject(i).getDouble("w");
+            new_graph.connect(src,dest,w);
+        }
+        rawGraph = new Directed_Weighted_Graph((Directed_Weighted_Graph) new_graph);
+        return true;
     }
 }

@@ -19,7 +19,7 @@ import static api.lib.parseJSONFile;
 
 
 public class Directed_Weighted_Graph implements DirectedWeightedGraph {
-    
+
     HashMap<Integer, NodeData> nodesMap;
     HashMap<Integer, EdgeData> edgeMap;
     HashMap<Integer, HashMap<Integer, EdgeData>> destToSource;
@@ -100,8 +100,10 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
     @Override
     public EdgeData getEdge(int src, int dest)
     {
-        if(nodesMap.get(dest).getInEdges().containsKey(src)){
-            return nodesMap.get(dest).getInEdges().get(src);
+        if(nodesMap.containsKey(dest)) {
+            if (nodesMap.get(dest).getInEdges().containsKey(src)) {
+                return nodesMap.get(dest).getInEdges().get(src);
+            }
         }
         return null;
     }
@@ -346,7 +348,7 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
             Iterator.super.forEachRemaining(action);
         }
     }
-    
+
 
     @Override
     public EdgeData removeEdge(int src, int dest) {

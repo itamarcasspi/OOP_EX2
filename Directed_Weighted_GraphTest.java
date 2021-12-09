@@ -40,6 +40,12 @@ class Directed_Weighted_GraphTest {
 
     @Test
     void getEdge() {
+        my_graph.addNode(a0);
+        my_graph.addNode(b1);
+        my_graph.addNode(c2);
+        my_graph.addNode(d3);
+        my_graph.addNode(e4);
+        my_graph.addNode(f5);
         my_graph.connect(a0.getKey(), b1.getKey(), 4);
         my_graph.connect(a0.getKey(), c2.getKey(), 2);
         my_graph.connect(b1.getKey(), c2.getKey(), 5);
@@ -115,6 +121,12 @@ class Directed_Weighted_GraphTest {
     //test of the "all edges" iterator
     @Test
     void edgeIter() {
+        my_graph.addNode(a0);
+        my_graph.addNode(b1);
+        my_graph.addNode(c2);
+        my_graph.addNode(d3);
+        my_graph.addNode(e4);
+        my_graph.addNode(f5);
         my_graph.connect(a0.getKey(), b1.getKey(), 4);
         my_graph.connect(a0.getKey(), c2.getKey(), 2);
         my_graph.connect(b1.getKey(), c2.getKey(), 5);
@@ -175,6 +187,12 @@ class Directed_Weighted_GraphTest {
 
     @Test
     void testEdgeIter() {
+        my_graph.addNode(a0);
+        my_graph.addNode(b1);
+        my_graph.addNode(c2);
+        my_graph.addNode(d3);
+        my_graph.addNode(e4);
+        my_graph.addNode(f5);
         my_graph.connect(a0.getKey(), b1.getKey(), 4);
         my_graph.connect(a0.getKey(), c2.getKey(), 2);
         my_graph.connect(b1.getKey(), c2.getKey(), 5);

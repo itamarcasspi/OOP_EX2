@@ -23,6 +23,9 @@ public class Node_Data implements NodeData{
         this.weight = w;
         this.data = d;
         this.id = unique_id_generator++;
+        this.outEdges = new HashMap<>();
+        this.inEdges = new HashMap<>();
+
     }
 
     public Node_Data(int id, String data) {

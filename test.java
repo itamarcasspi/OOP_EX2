@@ -70,5 +70,14 @@ public class test {
             System.out.print(pathlist.get(i).getKey()+">");
         }
         System.out.println();
+//        my_graph = new Directed_Weighted_Graph("data/G3.json");
+        DirectedWeightedGraphAlgorithms algo1 = new Directed_Weighted_Graph_Algorithms(my_graph);
+        algo1.load("data/G3.json");
+
+        System.out.println(algo1.center().getKey());
+        System.out.println(algo1.isConnected());
+
+
+
     }
 }
