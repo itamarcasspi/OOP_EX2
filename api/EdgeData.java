@@ -6,11 +6,14 @@ package api;
 
  */
 public interface EdgeData {
+
 	/**
 	 * The id of the source node of this edge.
 	 * @return
 	 */
 	public int getSrc();
+	
+	public int getId();
 	/**
 	 * The id of the destination node of this edge
 	 * @return
