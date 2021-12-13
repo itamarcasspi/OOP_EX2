@@ -83,9 +83,11 @@ public class test {
 //            System.out.print(pathlist.get(i).getKey()+">");
 //        }
         List<NodeData> list_for_tsp = new LinkedList<>();
-        list_for_tsp.add(algo1.getGraph().getNode(0));
-        list_for_tsp.add(algo1.getGraph().getNode(3));
-        list_for_tsp.add(algo1.getGraph().getNode(6));
+        list_for_tsp.add(algo1.getGraph().getNode(10));
+        list_for_tsp.add(algo1.getGraph().getNode(11));
+        list_for_tsp.add(algo1.getGraph().getNode(12));
+        list_for_tsp.add(algo1.getGraph().getNode(5));
+
         List<NodeData> tsp = algo1.tsp(list_for_tsp);
         for (int i = 0; i<tsp.size();i++)
         {

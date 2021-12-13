@@ -7,6 +7,7 @@ import api.DirectedWeightedGraph;
 import api.DirectedWeightedGraphAlgorithms;
 import api.EdgeData;
 import api.NodeData;
+
 import java.util.Collections;
 
 import java.io.FileWriter;
@@ -22,7 +23,9 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
     boolean isConnected = true;
     private boolean pathCalculated = false;
 
-    /** sets the pathCalculated boolean to the given boolean **/
+    /**
+     * sets the pathCalculated boolean to the given boolean
+     **/
     public void setPathCalculated(boolean pathCalculated) {
         this.pathCalculated = pathCalculated;
         if (!pathCalculated)
@@ -57,35 +60,32 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
     @Override
     public boolean isConnected() {
 
-        HashMap<Integer,Boolean> visited = new HashMap<>();
+        HashMap<Integer, Boolean> visited = new HashMap<>();
         int[] nodes_id = new int[this.rawGraph.nodeSize()];
         LinkedList<Integer> q = new LinkedList<>();
         Iterator<NodeData> node = rawGraph.nodeIter();
 
         int i = 0;
-        while(node.hasNext())
-        {
+        while (node.hasNext()) {
             NodeData current = node.next();
             nodes_id[i++] = current.getKey();
 
-            visited.put(current.getKey(),false);
+            visited.put(current.getKey(), false);
         }
 
         node = rawGraph.nodeIter();
         int current = node.next().getKey();
-        visited.put(current,true);
+        visited.put(current, true);
         q.add(current);
 
-        while(!q.isEmpty())
-        {
+        while (!q.isEmpty()) {
             current = q.poll();
             Iterator<EdgeData> edge_it = rawGraph.edgeIter(current);
-            while (edge_it.hasNext())
-            {
+            while (edge_it.hasNext()) {
 
                 EdgeData current_edge = edge_it.next();
                 if (!visited.get(current_edge.getDest())) {
-                    visited.put(current_edge.getDest(),true);
+                    visited.put(current_edge.getDest(), true);
                     q.add(current_edge.getDest());
                 }
 
@@ -98,8 +98,7 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
     // dijkstra
     @Override
     public double shortestPathDist(int src, int dest) {
-        if(rawGraph.getNode(src)==null || rawGraph.getNode(dest)==null)
-        {
+        if (rawGraph.getNode(src) == null || rawGraph.getNode(dest) == null) {
             return -1;
         }
         double[] dist = new double[rawGraph.nodeSize()];
@@ -142,12 +141,11 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public List<NodeData> shortestPath(int src, int dest) {
-        if(rawGraph.getNode(src)==null || rawGraph.getNode(dest)==null)
-        {
+        if (rawGraph.getNode(src) == null || rawGraph.getNode(dest) == null) {
             return null;
         }
         double[] dist = new double[rawGraph.nodeSize()];
-        int[] prev = new int[rawGraph.nodeSize()+1];
+        int[] prev = new int[rawGraph.nodeSize() + 1];
         dist[src] = 0;
         PriorityQueue<ComparableNode> q = new PriorityQueue<>();
         Iterator<NodeData> node_it = rawGraph.nodeIter();
@@ -183,19 +181,10 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
         }
         List<NodeData> prevList = new LinkedList<>();
         prevList.add(rawGraph.getNode(dest));
-        int[] sorted_path = new int[prev.length];
-        for (int i = 0 ; i<prev.length;i++)
-        {
-            System.out.println("["+i+"]"+prev[i]);
-        }
-
-
-        for (int i = dest; i!=src; i = prev[i]) {
+        for (int i = dest; i != src; i = prev[i]) {
             prevList.add(rawGraph.getNode(prev[i]));
         }
-
         Collections.reverse(prevList);
-        System.out.println("Path dist = "+dist[dest]);
         return prevList;
     }
 
@@ -205,29 +194,22 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
         double min_longest_path = Integer.MAX_VALUE;
         Iterator<NodeData> node_it = rawGraph.nodeIter();
         double[][] dist = new double[rawGraph.nodeSize()][rawGraph.nodeSize()];
-        for (int i = 0; i<rawGraph.nodeSize();i++)
-        {
-            for (int j = 0; j<rawGraph.nodeSize();j++)
-            {
+        for (int i = 0; i < rawGraph.nodeSize(); i++) {
+            for (int j = 0; j < rawGraph.nodeSize(); j++) {
                 dist[i][j] = 2000000000;
-                if(i==j)
-                {
+                if (i == j) {
                     dist[i][j] = 0;
                 }
             }
         }
         Iterator<EdgeData> edge_it = rawGraph.edgeIter();
-        while (edge_it.hasNext())
-        {
+        while (edge_it.hasNext()) {
             EdgeData current = edge_it.next();
             dist[current.getSrc()][current.getDest()] = current.getWeight();
         }
-        for (int k = 0 ; k<rawGraph.nodeSize();k++)
-        {
-            for (int j = 0; j<rawGraph.nodeSize();j++)
-            {
-                for (int i = 0; i<rawGraph.nodeSize();i++)
-                {
+        for (int k = 0; k < rawGraph.nodeSize(); k++) {
+            for (int j = 0; j < rawGraph.nodeSize(); j++) {
+                for (int i = 0; i < rawGraph.nodeSize(); i++) {
                     if (dist[i][j] > dist[i][k] + dist[k][j]) {
                         dist[i][j] = dist[i][k] + dist[k][j];
                     }
@@ -235,18 +217,14 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
             }
         }
 
-        for (int i = 0; i<rawGraph.nodeSize();i++)
-        {
+        for (int i = 0; i < rawGraph.nodeSize(); i++) {
             double current_max_path = 0;
-            for (int j = 0; j<rawGraph.nodeSize();j++)
-            {
-                if(dist[i][j]>current_max_path)
-                {
+            for (int j = 0; j < rawGraph.nodeSize(); j++) {
+                if (dist[i][j] > current_max_path) {
                     current_max_path = dist[i][j];
                 }
             }
-            if(current_max_path<min_longest_path)
-            {
+            if (current_max_path < min_longest_path) {
                 min_longest_path = current_max_path;
                 center_id = i;
             }
@@ -257,16 +235,56 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
     @Override
     public List<NodeData> tsp(List<NodeData> cities) {
         List<NodeData> ans = new LinkedList<>();
-        List<NodeData> temp;
-        for(int i = 0; i< cities.size()-1;i++)
-        {
-            temp = this.shortestPath(cities.get(i).getKey(),cities.get(i+1).getKey());
-            for (int j = 0; j<temp.size();j++)
+        List<NodeData> original = new LinkedList<>(cities);
+        List<NodeData> temp = new LinkedList<>();
+
+        int closest_node = 0;
+        double shortest_path = Double.MAX_VALUE;
+
+        for(int z = 0; z<cities.size();z++) {
+
+            double current_path_cost = 0;
+            for (int i = z, t = 0; t < cities.size(); i = closest_node, t++) {
+                double shortest_dist = Double.MAX_VALUE;
+
+                if (cities.get(i) != null) {
+                    for (int j = 0; j < cities.size(); j++) {
+                        if (cities.get(j) == null || i == j) {
+                            continue;
+                        }
+                        double curr_dist = shortestPathDist(cities.get(i).getKey(), cities.get(j).getKey());
+                        if (curr_dist < shortest_dist) {
+                            closest_node = j;
+                            shortest_dist = curr_dist;
+                        }
+                    }
+                    if (cities.get(i).getKey() != cities.get(closest_node).getKey()) {
+                        List<NodeData> to_closest_node = shortestPath(cities.get(i).getKey(), cities.get(closest_node).getKey());
+                        current_path_cost+=shortestPathDist(cities.get(i).getKey(), cities.get(closest_node).getKey());
+                        cities.set(i, null);
+                        for (int k = 0; k < to_closest_node.size(); k++) {
+                            ans.add(to_closest_node.get(k));
+                        }
+                    }
+                }
+
+
+            }
+
+            cities = new LinkedList<>(original);
+            if(current_path_cost<shortest_path)
             {
-                ans.add(temp.get(j));
+                shortest_path = current_path_cost;
+                temp = ans;
+            }
+            ans = new LinkedList<>();
+        }
+        for (int i = 0; i < temp.size() - 1; i++) {
+            if (temp.get(i) == temp.get(i + 1)) {
+                temp.remove(i);
             }
         }
-        return ans;
+        return temp;
     }
 
     @Override
@@ -300,14 +318,13 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
             FileWriter Files = new FileWriter(file);
             Files.write(json.toString());
             Files.close();
-        }catch (IOException f) {
+        } catch (IOException f) {
             f.printStackTrace();
             return false;
         }
         return true;
 
     }
-
 
 
     @Override
@@ -322,9 +339,9 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
             return false;
         }
         JSONArray jsonNodes = jsonObject.getJSONArray("Nodes");
-        for(int i=0;i<jsonNodes.length();i++){
-            int key=jsonNodes.getJSONObject(i).getInt("id");
-            String pos=jsonNodes.getJSONObject(i).getString("pos");
+        for (int i = 0; i < jsonNodes.length(); i++) {
+            int key = jsonNodes.getJSONObject(i).getInt("id");
+            String pos = jsonNodes.getJSONObject(i).getString("pos");
             Node_Data v = new Node_Data(key, pos);
             new_graph.addNode(v);
         }
@@ -334,7 +351,7 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
             int src = jsonEdges.getJSONObject(i).getInt("src");
             int dest = jsonEdges.getJSONObject(i).getInt("dest");
             double w = jsonEdges.getJSONObject(i).getDouble("w");
-            new_graph.connect(src,dest,w);
+            new_graph.connect(src, dest, w);
         }
         rawGraph = new Directed_Weighted_Graph((Directed_Weighted_Graph) new_graph);
         return true;

@@ -140,5 +140,40 @@ class Directed_Weighted_Graph_AlgorithmsTest {
 
     @Test
     void tsp() {
+        DirectedWeightedGraphAlgorithms algo = new Directed_Weighted_Graph_Algorithms("data/G1.json");
+        List<NodeData> correct_path = new LinkedList<>();
+        correct_path.add(algo.getGraph().getNode(12));
+        correct_path.add(algo.getGraph().getNode(11));
+        correct_path.add(algo.getGraph().getNode(10));
+        correct_path.add(algo.getGraph().getNode(9));
+        correct_path.add(algo.getGraph().getNode(8));
+        correct_path.add(algo.getGraph().getNode(7));
+        correct_path.add(algo.getGraph().getNode(6));
+        correct_path.add(algo.getGraph().getNode(5));
+
+        List<NodeData> list_for_tsp = new LinkedList<>();
+        list_for_tsp.add(algo.getGraph().getNode(10));
+        list_for_tsp.add(algo.getGraph().getNode(11));
+        list_for_tsp.add(algo.getGraph().getNode(12));
+        list_for_tsp.add(algo.getGraph().getNode(5));
+
+        List<NodeData> tsp = algo.tsp(list_for_tsp);
+        for (int i = 0; i<tsp.size() ; i++)
+        {
+            assertEquals(correct_path.get(i),tsp.get(i));
+        }
+
+        list_for_tsp.clear();
+        list_for_tsp.add(algo.getGraph().getNode(10));
+        list_for_tsp.add(algo.getGraph().getNode(11));
+        list_for_tsp.add(algo.getGraph().getNode(7));
+        list_for_tsp.add(algo.getGraph().getNode(5));
+        list_for_tsp.add(algo.getGraph().getNode(12));
+        tsp = algo.tsp(list_for_tsp);
+        for (int i = 0; i<tsp.size() ; i++)
+        {
+            assertEquals(correct_path.get(i),tsp.get(i));
+        }
+
     }
 }
