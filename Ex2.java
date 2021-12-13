@@ -65,7 +65,6 @@ public class Ex2 {
     }
 
     public static void main(String[] args) {
-        // DirectedWeightedGraphAlgorithms t = new Directed_Weighted_Graph_Algorithms("data/G1.json");
         String basePath = "data/";
         DirectedWeightedGraphAlgorithms t = new Directed_Weighted_Graph_Algorithms(basePath + args[0]);
         runGUI(t);
