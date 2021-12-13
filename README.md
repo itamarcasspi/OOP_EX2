@@ -28,3 +28,10 @@ The algorithms that we have implemented in the project are the following:
    Returns a list of nodes that represent the shortest path that contains all the nodes in the list "cities".
    A variation of the known The Traveling Salesman algorithm.
   
+Analysis of the program:
+1k graph:
+  load() = 100ms, isConnected() = 420ms , shortest() = 430ms, center() = 16sec, 738ms
+ 10k graph:
+  load() = 820ms , isConnected() = 1 sec, 310ms , shortest() = 1sec, 820ms
+ 100k:
+  load() = 23sec, 770ms
