@@ -37,7 +37,8 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
     public Directed_Weighted_Graph(Directed_Weighted_Graph g) {
         nodesMap = new HashMap<>();
         edgeMap = new HashMap<>();
-
+        edges_size = g.edges_size;
+        mc = g.mc;
         /** Go through all the nodes in g and create a new node that copies the node in g **/
         Iterator<NodeData> NodeI = g.nodeIter();
         while(NodeI.hasNext()) {
@@ -138,8 +139,8 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
         return new NodeIterator(getMC());
     }
     class NodeIterator implements Iterator<NodeData>{
-        int mc_at_init;
-        Iterator<NodeData> it;
+        private int mc_at_init;
+        private Iterator<NodeData> it;
 
         public NodeIterator(int mc)
         {
@@ -259,7 +260,7 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
     @Override
     public Iterator<EdgeData> edgeIter() {
-        return new EdgeIter();
+        return new EdgeIter(mc);
     }
 
     /**
@@ -270,7 +271,7 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
      */
     @Override
     public Iterator<EdgeData> edgeIter(int node_id) {
-        return new outEdgesIter(node_id); //probably not the solution but maybe it is
+        return new outEdgesIter(node_id,this.mc); //probably not the solution but maybe it is
     }
 
     //remove node complexity is as the number of its neighbors- we delete the edges that the node is the src and dst
@@ -286,22 +287,24 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
             /**SIZE OF inIds+outIds is equal to v.degree**/
             /** O(3*v.degree)=O(v.degree)**/
             for (int i = 0; i < inIds.length; i++) {
-                inIds[i] = getEdge((int) inedges[i], key).getId();
+                inIds[i] = this.getEdge((int) inedges[i], key).getId();
             }
             for (int i = 0; i < outIds.length; i++) {
-                outIds[i] = getEdge(key, (int) outedges[i]).getId();
+                outIds[i] = this.getEdge(key, (int) outedges[i]).getId();
             }
 
             for (int i = 0; i < inIds.length; i++) {
-                removeEdge(inIds[i], i);
+                this.removeEdge((int)inedges[i],key);
+
             }
             for (int i = 0; i < outIds.length; i++) {
-                removeEdge(outIds[i], i);
+                this.removeEdge(key,(int)outedges[i]);
+
             }
 
             nodesMap.get(key).getOutEdges().clear();       //Clear is O(n) where n is the number of out edges
             nodesMap.get(key).getInEdges().clear();        //Clear is O(n) where n is the number of in edges
-
+            edgeMap.remove(key);
             mc++;
             return nodesMap.remove(key);
         } else return null;
@@ -309,28 +312,41 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
 
     private class outEdgesIter implements Iterator<EdgeData> {
-
+        private int mc_at_init;
         private Iterator<EdgeData> Iter;
         private EdgeData currEdge;
         int key;
-        public outEdgesIter(int NodeKey) {
+        public outEdgesIter(int NodeKey,int _mc) {
+            mc_at_init = _mc;
             Iter = nodesMap.get(NodeKey).getOutEdges().values().iterator();
             key = NodeKey;
         }
 
         @Override
         public boolean hasNext() {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             return Iter.hasNext();
         }
 
         @Override
         public EdgeData next() {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             currEdge = Iter.next();
             return currEdge;
         }
 
         @Override
         public void remove() {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             if (!Iter.hasNext()) return;
             EdgeData tempEdge = Iter.next();
             EdgeData nextEdge;
@@ -345,6 +361,10 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
         @Override
         public void forEachRemaining(Consumer<? super EdgeData> action) {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             Iterator.super.forEachRemaining(action);
         }
     }
@@ -359,31 +379,45 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
         edgeMap.remove(id);
         nodesMap.get(dest).getInEdges().remove(src);
         mc++;
+        edges_size--;
         return nodesMap.get(src).getOutEdges().remove(dest);
         } else return null;
     }
 
     private class EdgeIter implements Iterator<EdgeData> {
-
+        private int mc_at_init;
         private EdgeData currEdge;
         private Iterator<EdgeData> Iter;
-        public EdgeIter() {
+        public EdgeIter(int _mc) {
+            mc_at_init = _mc;
             Iter = edgeMap.values().iterator();
         }
 
         @Override
         public boolean hasNext() {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             return Iter.hasNext();
         }
 
         @Override
         public EdgeData next() {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             currEdge = Iter.next();
             return currEdge;
         }
 
         @Override
         public void remove() {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             EdgeData tempEdge = Iter.next();
             EdgeData nextEdge;
             removeEdge(currEdge.getId(),0);
@@ -397,6 +431,10 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
         @Override
         public void forEachRemaining(Consumer<? super EdgeData> action) {
+            if(mc_at_init != mc)
+            {
+                throw new RuntimeException();
+            }
             Iterator.super.forEachRemaining(action);
         }
     }

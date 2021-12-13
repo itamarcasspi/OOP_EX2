@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class Directed_Weighted_GraphTest {
     DirectedWeightedGraph my_graph = new Directed_Weighted_Graph();
     GeoLocation location = new Geo_Location(4,4,4);
-    NodeData a0 = new Node_Data(location,0,"a");
-    NodeData b1 = new Node_Data(location,1,"b");
-    NodeData c2 = new Node_Data(location,2,"c");
-    NodeData d3 = new Node_Data(location,3,"d");
-    NodeData e4 = new Node_Data(location,4,"e");
-    NodeData f5 = new Node_Data(location,5,"f");
+    NodeData a0 = new Node_Data(0,"0,1,2");
+    NodeData b1 = new Node_Data(1,"0,1,2");
+    NodeData c2 = new Node_Data(2,"0,1,2");
+    NodeData d3 = new Node_Data(3,"0,1,2");
+    NodeData e4 = new Node_Data(4,"0,1,2");
+    NodeData f5 = new Node_Data(5,"0,1,2");
 
     @Test
     void getNode() {
@@ -301,12 +301,19 @@ class Directed_Weighted_GraphTest {
 
 
         assertEquals(my_graph.removeNode(0),a0);
+        assertEquals(my_graph.getEdge(0,1),null);
+        assertEquals(my_graph.getEdge(0,2),null);
 
 
     }
 
     @Test
     void removeEdge() {
+        my_graph = new Directed_Weighted_Graph("data/G1.json");
+        assertNotEquals(my_graph.getEdge(0,1),null);
+        my_graph.removeEdge(0,1);
+        assertEquals(my_graph.getEdge(0,1),null);
+
     }
 
     @Test
@@ -316,10 +323,55 @@ class Directed_Weighted_GraphTest {
 
     @Test
     void edgeSize() {
+        my_graph.addNode(a0);
+        my_graph.addNode(b1);
+        my_graph.addNode(c2);
+        my_graph.addNode(d3);
+        my_graph.addNode(e4);
+        my_graph.addNode(f5);
+        my_graph.connect(a0.getKey(), b1.getKey(), 4);
+        my_graph.connect(a0.getKey(), c2.getKey(), 2);
+        my_graph.connect(b1.getKey(), c2.getKey(), 5);
+        my_graph.connect(c2.getKey(), e4.getKey(), 3);
+        my_graph.connect(b1.getKey(), d3.getKey(), 10);
+        my_graph.connect(e4.getKey(), d3.getKey(), 4);
+        my_graph.connect(d3.getKey(), f5.getKey(), 11);
+        EdgeData a0_b1 = my_graph.getEdge(0, 1);
+        EdgeData a0_c2 = my_graph.getEdge(0, 2);
+        EdgeData b1_c2 = my_graph.getEdge(1, 2);
+        EdgeData c2_e4 = my_graph.getEdge(2, 4);
+        EdgeData b1_d3 = my_graph.getEdge(1, 3);
+        EdgeData e4_d3 = my_graph.getEdge(4, 3);
+        EdgeData d3_f5 = my_graph.getEdge(3, 5);
+
+        my_graph.removeNode(0);
+        assertEquals(my_graph.edgeSize(),5);
+        assertEquals(my_graph.getEdge(0,1),null);
+        assertEquals(my_graph.getEdge(0,2),null);
+
+        my_graph.removeNode(3);
+        assertEquals(my_graph.edgeSize(),2);
+        assertEquals(my_graph.getEdge(1,3),null);
+        assertEquals(my_graph.getEdge(4,3),null);
+        assertEquals(my_graph.getEdge(3,5),null);
+
+
     }
 
     @Test
     void getMC() {
+        assertEquals(my_graph.getMC(),0);
+        my_graph.addNode(a0);
+        my_graph.addNode(b1);
+        my_graph.addNode(c2);
+        my_graph.connect(a0.getKey(), b1.getKey(), 4);
+        my_graph.connect(a0.getKey(), c2.getKey(), 2);
+        my_graph.connect(b1.getKey(), c2.getKey(), 5);
+        assertEquals(my_graph.getMC(),6);
+        my_graph.removeNode(0);
+        assertEquals(my_graph.getMC(),9);
+        my_graph.removeEdge(1,2);
+        assertEquals(my_graph.getMC(),10);
     }
 
     @Test

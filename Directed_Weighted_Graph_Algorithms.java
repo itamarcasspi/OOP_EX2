@@ -56,12 +56,24 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public boolean isConnected() {
-        boolean[] visited = new boolean[rawGraph.nodeSize()];
-        LinkedList<Integer> q = new LinkedList<>();
 
+        HashMap<Integer,Boolean> visited = new HashMap<>();
+        int[] nodes_id = new int[this.rawGraph.nodeSize()];
+        LinkedList<Integer> q = new LinkedList<>();
         Iterator<NodeData> node = rawGraph.nodeIter();
+
+        int i = 0;
+        while(node.hasNext())
+        {
+            NodeData current = node.next();
+            nodes_id[i++] = current.getKey();
+
+            visited.put(current.getKey(),false);
+        }
+
+        node = rawGraph.nodeIter();
         int current = node.next().getKey();
-        visited[current] = true;
+        visited.put(current,true);
         q.add(current);
 
         while(!q.isEmpty())
@@ -70,27 +82,26 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
             Iterator<EdgeData> edge_it = rawGraph.edgeIter(current);
             while (edge_it.hasNext())
             {
+
                 EdgeData current_edge = edge_it.next();
-                if(!visited[current_edge.getDest()])
-                {
-                    visited[current_edge.getDest()] = true;
+                if (!visited.get(current_edge.getDest())) {
+                    visited.put(current_edge.getDest(),true);
                     q.add(current_edge.getDest());
                 }
+
             }
         }
-        for (boolean visit:visited)
-        {
-            if(!visit)
-            {
-                return false;
-            }
-        }
-        return true;
+
+        return !visited.containsValue(false);
     }
 
     // dijkstra
     @Override
     public double shortestPathDist(int src, int dest) {
+        if(rawGraph.getNode(src)==null || rawGraph.getNode(dest)==null)
+        {
+            return -1;
+        }
         double[] dist = new double[rawGraph.nodeSize()];
         double[] prev = new double[rawGraph.nodeSize()];
         dist[src] = 0;
@@ -131,8 +142,12 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public List<NodeData> shortestPath(int src, int dest) {
+        if(rawGraph.getNode(src)==null || rawGraph.getNode(dest)==null)
+        {
+            return null;
+        }
         double[] dist = new double[rawGraph.nodeSize()];
-        int[] prev = new int[rawGraph.nodeSize()];
+        int[] prev = new int[rawGraph.nodeSize()+1];
         dist[src] = 0;
         PriorityQueue<ComparableNode> q = new PriorityQueue<>();
         Iterator<NodeData> node_it = rawGraph.nodeIter();
@@ -169,13 +184,18 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
         List<NodeData> prevList = new LinkedList<>();
         prevList.add(rawGraph.getNode(dest));
         int[] sorted_path = new int[prev.length];
+        for (int i = 0 ; i<prev.length;i++)
+        {
+            System.out.println("["+i+"]"+prev[i]);
+        }
+
 
         for (int i = dest; i!=src; i = prev[i]) {
             prevList.add(rawGraph.getNode(prev[i]));
         }
 
         Collections.reverse(prevList);
-
+        System.out.println("Path dist = "+dist[dest]);
         return prevList;
     }
 
@@ -236,8 +256,17 @@ public class Directed_Weighted_Graph_Algorithms implements DirectedWeightedGraph
 
     @Override
     public List<NodeData> tsp(List<NodeData> cities) {
-
-        return null;
+        List<NodeData> ans = new LinkedList<>();
+        List<NodeData> temp;
+        for(int i = 0; i< cities.size()-1;i++)
+        {
+            temp = this.shortestPath(cities.get(i).getKey(),cities.get(i+1).getKey());
+            for (int j = 0; j<temp.size();j++)
+            {
+                ans.add(temp.get(j));
+            }
+        }
+        return ans;
     }
 
     @Override

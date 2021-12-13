@@ -62,21 +62,35 @@ public class test {
             System.out.println("src = "+current.getSrc()+" dest = "+current.getDest());
 
         }
-        System.out.println("shortest path is : "+algo.shortestPathDist(a0.getKey(),f5.getKey()));
-
-        List<NodeData> pathlist = algo.shortestPath(a0.getKey(),f5.getKey());
-        for (int i = 0; i<pathlist.size();i++)
-        {
-            System.out.print(pathlist.get(i).getKey()+">");
-        }
+//        System.out.println("shortest path is : "+algo.shortestPathDist(a0.getKey(),f5.getKey()));
+//
+//        List<NodeData> pathlist = algo.shortestPath(a0.getKey(),f5.getKey());
+//        for (int i = 0; i<pathlist.size();i++)
+//        {
+//            System.out.print(pathlist.get(i).getKey()+">");
+//        }
         System.out.println();
-//        my_graph = new Directed_Weighted_Graph("data/G3.json");
+        my_graph = new Directed_Weighted_Graph("data/G3.json");
         DirectedWeightedGraphAlgorithms algo1 = new Directed_Weighted_Graph_Algorithms(my_graph);
-        algo1.load("data/G3.json");
+        System.out.println(algo1.load("data/G1.json"));
 
-        System.out.println(algo1.center().getKey());
-        System.out.println(algo1.isConnected());
-
+//        System.out.println(algo1.center().getKey());
+//        System.out.println(algo1.isConnected());
+//         System.out.println("shortest path = "+algo1.shortestPathDist(3,6));
+//        List<NodeData> pathlist = algo1.shortestPath(3,6);
+//        for (int i = 0; i<pathlist.size();i++)
+//        {
+//            System.out.print(pathlist.get(i).getKey()+">");
+//        }
+        List<NodeData> list_for_tsp = new LinkedList<>();
+        list_for_tsp.add(algo1.getGraph().getNode(0));
+        list_for_tsp.add(algo1.getGraph().getNode(3));
+        list_for_tsp.add(algo1.getGraph().getNode(6));
+        List<NodeData> tsp = algo1.tsp(list_for_tsp);
+        for (int i = 0; i<tsp.size();i++)
+        {
+            System.out.print(tsp.get(i).getKey()+">");
+        }
 
 
     }

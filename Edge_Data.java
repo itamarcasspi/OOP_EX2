@@ -89,4 +89,20 @@ public class Edge_Data implements EdgeData {
         }
         return true;
     }
+
+    public void print()
+    {
+        System.out.println(src+"-["+weight+"]->"+dest);
+    }
+
+    @Override
+    public String toString() {
+        return "Edge_Data{" +
+                "src=" + src +
+                ", dest=" + dest +
+                ", id=" + id +
+                ", weight=" + weight +
+                ", info='" + info + '\'' +
+                '}';
+    }
 }

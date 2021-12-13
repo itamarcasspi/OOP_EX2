@@ -108,4 +108,17 @@ public class Node_Data implements NodeData{
     public void setTag(int t) {
         this.tag = t;
     }
+
+    @Override
+    public String toString() {
+        return "Node_Data{" +
+                "id=" + id +
+                ", tag=" + tag +
+                ", weight=" + weight +
+                ", thisLocation=" + thisLocation +
+                ", data='" + data + '\'' +
+                ", outEdges=" + outEdges +
+                ", inEdges=" + inEdges +
+                '}';
+    }
 }
