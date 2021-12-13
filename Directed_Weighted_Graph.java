@@ -22,14 +22,14 @@ public class Directed_Weighted_Graph implements DirectedWeightedGraph {
 
     HashMap<Integer, NodeData> nodesMap;
     HashMap<Integer, EdgeData> edgeMap;
-    HashMap<Integer, HashMap<Integer, EdgeData>> destToSource;
+
     int edges_size;
     int mc;
 
     public Directed_Weighted_Graph() {
         nodesMap = new HashMap<Integer, NodeData>();
         edgeMap = new HashMap<Integer, EdgeData>();
-        destToSource = new HashMap<Integer, HashMap<Integer, EdgeData>>();
+
         mc = 0;
         edges_size=0;
     }
