@@ -116,6 +116,9 @@ graph was not loaded the original graph should remain "as is".
 - public boolean load(String file);
 
 
+##UML
+ 
+ ![Screenshot from 2021-12-13 16-34-13](https://user-images.githubusercontent.com/74679553/145852822-154cc921-093b-4aaf-9ba3-8eb672a5d278.png)
 
 
 
