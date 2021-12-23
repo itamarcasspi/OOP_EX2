@@ -2,6 +2,74 @@
 # oop-ex2
  
 In this project we have implemented API's for a Directed and Weighted graph, and a GUI.
+
+## How to use the GUI
+
+run the command 
+
+```java -jar Ex2.jar [FILE NAME]```
+
+*[FILE NAME] can be for example 'G1.json'. No need for 'data/' pre path.
+
+Final command for example:
+
+```java -jar Ex2.jar G1.json```
+
+
+The GUI will pop up to your screen, with the desired graph loaded.
+Buttons:
+
+Remove -
+This button will remove a node.
+
+Add -
+This button will add a new node.
+
+Load -
+You will be asked to insert a name of a graph you want to load to the GUI.
+Note that you ONLY need to insert the name of the graph, without it's path and without the '.json' at the end.
+The graph will have to be in the /data folder and be a json type.
+
+Save -
+You will be asked to give a name to the graph you want to save.
+The graph will be saved at the /data folder and will be a json type.
+Note that if you give it a name that already exists, it WILL override the old graph.
+
+Center -
+The center node will be colored blue.
+
+TSP -
+First you will be asked to enter HOW MANY nodes does the "sales man" has to visit.
+After that you will be asked to enter the IDs of nodes he wants to visit.
+You will receive and ordered list of the nodes he has to go through.
+Also, that path will be colored purple.
+
+TSPexample
+
+Path Dist -
+You will be asked to enter a source and destination IDs.
+Then a message will pop with the cost of the journey between the two nodes.
+
+Path -
+The same as path distance, only this function also paint the path on the graph.
+The nodes that you have to go through will be painted purple.
+
+Connect -
+This button will add a new edge.
+You will be asked to insert source and destination IDs, and a weighet.
+
+Disconnect -
+This button will remove an existing edge.
+You will be asked to insert source and destination IDs of the edge you want to remove.
+Make sure this edge exists.
+
+Toggles -
+You can toggle the printing of nodes, arrows and edges.
+Keep in mind that when loading large graphs, the GUI will toggle the edges or arrows by itself to shorten loading times.
+
+
+## API
+
 The API's that we have implemented are:
 
 - GeoLocation
